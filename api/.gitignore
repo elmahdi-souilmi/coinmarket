@@ -1,0 +1,8 @@
+node_modules/
+<<<<<<< HEAD
+node_modules
+node_modules
+node_modules
+=======
+.env
+>>>>>>> 326ea717664e2b1ac89ad3675c9fbae69ad3f3ca
