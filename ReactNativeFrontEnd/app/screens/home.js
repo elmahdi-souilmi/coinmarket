@@ -50,7 +50,7 @@ export default function Home () {
             <NavBar style={styles}>
             <NavButton onPress={toWallet}>
                 <NavButtonText style={styles.Text}>
-                    {"My Wallet"}
+                    {"Profile"}
                 </NavButtonText>
             </NavButton>
             <NavButton onPress={logOut}>
