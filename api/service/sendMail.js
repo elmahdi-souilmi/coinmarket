@@ -3,16 +3,13 @@ const nodemailer = require("nodemailer");
 
 // async..await is not allowed in global scope, must use a wrapper
 async function main(message) {
-    // Generate test SMTP service account from ethereal.email
-    // Only needed if you don't have a real mail account for testing
-    // let testAccount = await nodemailer.createTestAccount();
     console.log(message);
     // create reusable transporter object using google service
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
             user: 'mahdisouilmi95@gmail.com',
-            pass: '026434380baba' // naturally, replace both with your real credentials or an application-specific password
+            pass: '**********' //  password
         }
     });
 
@@ -30,9 +27,7 @@ async function main(message) {
 
     // Preview only available when sending through an Ethereal account
     console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
 }
-
 main().catch(console.error);
 module.exports = {
     main

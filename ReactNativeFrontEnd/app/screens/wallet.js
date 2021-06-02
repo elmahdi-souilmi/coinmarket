@@ -1,9 +1,11 @@
-import React, { useState } from 'react'
+import React, {
+    useState,
+    useEffect
+} from 'react'
 import { Button, StyleSheet, Text, View, Dimensions, TextInput, ScrollView } from 'react-native';
 const {height, width} = Dimensions.get('screen');
 import firebase from '../config'
 import { useHistory } from 'react-router';
-import { useEffect } from 'react';
 import NavBar, { NavButton, NavButtonText, NavTitle } from 'react-native-nav';
 
 export default function Home () {
@@ -15,7 +17,7 @@ export default function Home () {
     //console.log(user.uid)
 
     function renderWalletData () {
-        fetch("http://192.168.1.7:8080/user/userWallet").then(res => {
+        fetch("http://192.168.8.55:8080/user/userWallet").then(res => {
             return res.json()
         }).then(info => {
             console.log(info);
@@ -32,34 +34,6 @@ export default function Home () {
 
     renderWalletData()
 
-    // function createUserIfNotExist () {
-    //     fetch("http://192.168.11.104:8080/user/userWallet").then(res => {
-    //         return res.json()
-    //     }).then(info => {
-    //         //console.log(info)
-    //         info.map(i => {
-    //             if(user.uid != i.f_uid) {
-    //                 fetch(`http://192.168.11.104:8080/user/add/${user.uid}`, {
-    //                     method : 'POST',
-    //                     headers : {
-    //                         'Content-Type' : 'application/json'
-    //                     },
-    //                     body : JSON.stringify({
-    //                         f_uid : user.uid
-    //                     })
-    //                 }).then(res => {
-    //                     return res.json()
-    //                 }).then(data => {
-    //                     console.log(data)
-    //                 })
-    //             } else {
-    //                 console.log("Already Created")
-    //             }
-    //         })
-    //     })
-    //     //history.push("/Wallet")
-    // }
-
     function toCoins () {
         history.push("/Home")
     }
@@ -73,16 +47,13 @@ export default function Home () {
     }
 
     useEffect(() => {
-        //createUserIfNotExist()
+       
         renderWalletData()
     }, [])
 
     return (
         <View>
             <NavBar>
-            <NavTitle>
-            {user.email}
-            </NavTitle>
             <NavButton onPress={toCoins}>
                 <NavButtonText>
                     {"Coins"}
@@ -90,7 +61,7 @@ export default function Home () {
             </NavButton>
             <NavButton onPress={logOut}>
             <NavButtonText>
-                {"Se Deconnecter"}
+                {"Logout"}
             </NavButtonText>
             </NavButton>
             </NavBar>

@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
-import { Button, StyleSheet, Text, View, Dimensions, TextInput } from 'react-native';
+import { Button, StyleSheet, Text, View, Dimensions, TextInput, Image } from 'react-native';
 import * as Google from "expo-google-app-auth";
 import Constants from 'expo-constants';
 const {height, width} = Dimensions.get('screen');
 import firebase from '../config'
 import { useHistory } from 'react-router';
+import { blue } from '@material-ui/core/colors';
 
 const LogintoHome = () => {
     const history = useHistory()
@@ -35,9 +36,14 @@ const LogintoHome = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.head}>
-                Se Connecter :
-            </Text>
+                   <Text  style={styles.header}> Coins Market</Text>
+              <Image
+              source = {
+                {uri: 'https://w7.pngwing.com/pngs/372/192/png-transparent-commonwealth-bank-currency-converter-foreign-exchange-market-exchange-rate-bank.png'}
+              }
+              style={styles.img}
+                />
+
             <TextInput
             style={styles.inp}
             placeholder={"Enter Votre Email"}
@@ -55,7 +61,7 @@ const LogintoHome = () => {
                 title="Se Connecter"
                 onPress={loginUser}
                 />
-                <Text></Text>
+                
                 <Button
                 style={styles.btn2}
                 title="Inscription"
@@ -70,6 +76,11 @@ const LogintoHome = () => {
 export default LogintoHome;
 
 const styles = StyleSheet.create({
+  header :{ 
+    color: "#006CD5",
+    fontSize: 28,
+    marginBottom:30,
+  },
     container : {
       flex: 1,
       backgroundColor: '#fff',
@@ -80,18 +91,21 @@ const styles = StyleSheet.create({
       fontSize : 40
     },
     inp : {
-      width : width / 1.2,
-      marginTop : 100,
-      padding : 40,
-      borderColor : "black",
-      borderWidth : 2,
+      width : width / 1.07,
+      height : 40,
       marginTop : 20,
-      padding : 10,
-      borderColor : "gray",
-      borderWidth : 2,
+      padding : 7,
+      borderColor : "black",
+      borderWidth : 1,
+      borderRadius : 8
     },
     con : {
       paddingTop : 20,
-      padding : 20
+      color : "#841584"
+    },
+    img : {
+        width: 200,
+        height: 200,
+        borderRadius: 100
     }
 });

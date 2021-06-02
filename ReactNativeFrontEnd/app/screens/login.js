@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, StyleSheet, Text, View, Dimensions, TextInput } from 'react-native';
+import { Button, StyleSheet, Text, View, Dimensions, TextInput,Image } from 'react-native';
 import * as Google from "expo-google-app-auth";
 import Constants from 'expo-constants';
 const {height, width} = Dimensions.get('screen');
@@ -19,13 +19,16 @@ const Login = () => {
     setPassword('')
   }
 
+    function toLogin() {
+      history.push("/")
+    }
+
   function authEmail () {
     firebase.auth().createUserWithEmailAndPassword(email, password)
     .then((userCredential) => {
     let id = userCredential.user.uid
-    console.log(id);
       // Signed in 
-      axios.post('http://192.168.1.7:8080/user/add/', {
+      axios.post('http://192.168.8.55:8080/user/add/', {
         id: id,
       })
     .then(function (response) {
@@ -39,23 +42,29 @@ const Login = () => {
   }
     return (
       <View style={styles.container}>
-        <Text style={styles.head}>Inscription : </Text>
+   
+        <Text style={styles.head}> Create account </Text>
         <TextInput
         style={styles.inp}
-        placeholder={"Enter Votre Email"}
+        placeholder={"Email"}
         onChangeText={setEmail}
         />
         <TextInput
         style={styles.inp}
-        placeholder={"Enter Votre Password"}
+        placeholder={" Password"}
         secureTextEntry
         onChangeText={setPassword}
         />
         <View style={styles.con}>
           <Button 
-          title="Inscription"
+          title="Create"
           style={styles.btn}
           onPress={authEmail}
+          />
+                    <Button 
+          title = "I have already an account "
+          style={styles.btn}
+          onPress={toLogin}
           />
         </View>
       </View>
@@ -72,7 +81,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   head : {
-    fontSize : 40
+    fontSize : 35, 
+    color: "#006CD5"
   },
   inp : {
     width : width / 1.2,

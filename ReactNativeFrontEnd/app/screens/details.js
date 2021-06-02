@@ -2,27 +2,31 @@ import React, { useEffect, useState } from 'react'
 import firebase from '../config';
 const axios = require('axios');
 import { useHistory } from 'react-router';
-import Modal from 'react-native-modal';
-import { Text, View, Dimensions, StyleSheet, TouchableOpacity, Image,TextInput, ScrollView   } from 'react-native';
+// import Modal from 'react-native-modal';
 import {
-  LineChart,
-  BarChart,
-  PieChart,
-  ProgressChart,
-  ContributionGraph,
-  StackedBarChart
-} from "react-native-chart-kit";
+  Text,
+  View,
+  Dimensions,
+  StyleSheet,
+ Modal,
+ Pressable,
+  Image,
+  TextInput,
+  ScrollView,
+  Alert
+} from 'react-native';
+import {LineChart,} from "react-native-chart-kit";
 import NavBar, { NavButton, NavButtonText, NavTitle } from 'react-native-nav';
-import Svg, {Circle, Path, Rect} from 'react-native-svg';
-import { Button } from '@material-ui/core';
 
-export default function Details (props) {
+
+export default function Details(props ) {
 
     var user = firebase.auth().currentUser;
     let history = useHistory()
-    // const [dataa, setData] = React.useState([])
+    const [modalVisible1, setModalVisible1] = useState(false);
+    const [modalVisible2, setModalVisible2] = useState(false);
     const [date, setDate] = React.useState([])
-    const [priceUsdd, setPriceUsd] = React.useState([])
+    const [priceUsdd, setPriceUsd] = React.useState([0, 0, 0, 0, 0, 0,0])
     const [price, setPrice] = React.useState("")
     const [val, setCurrVal] = React.useState("")
     const [value, setValue] = React.useState("0")
@@ -30,49 +34,55 @@ export default function Details (props) {
     (props.location && props.location.state) || {};
 
 
-    function buy () {
-      console.log("test");
-      fetch("http://192.168.1.7:8080/user/userWallet").then(res => {
+    function buy() {
+      console.log(val);
+ fetch("http://192.168.8.55:8080/user/userWallet").then(res => {
         return res.json()
       }).then(data => {
         data.map(i => {
-          if(i.f_uid == user.uid){
-            //console.log(i)
-            //console.log(i.id+" "+name+" "+val+" "+val*priceUsd)
-            fetch("http://192.168.1.7:8080/wallet/add", {
-              method : 'POST',
-              headers : {
+          if (i.f_uid == user.uid) {
+            fetch("http://192.168.8.55:8080/wallet/add", {
+              method: 'POST',
+              headers: {
                 'Accept': 'application/json',
-                'Content-Type' : 'application/json'
+                'Content-Type': 'application/json'
               },
-              body : JSON.stringify({
-                id : i.id.toString(),
-                id_user : i.id.toString(),
-                cryp_name : name,
-                currencyPrice : val*priceUsd,
-                value : parseFloat(val)
+              body: JSON.stringify({
+                id: i.id.toString(),
+                id_user: i.id.toString(),
+                cryp_name: name,
+                currencyPrice: val * priceUsd,
+                value: parseFloat(val)
               })
             }).then(res => {
               return res.json()
             }).then(info => {
-              alert("Done")
-              history.push("/Home")
+                  Alert.alert(
+                    "Done!",
+                    `you just buyed ${val} ${name}` ,
+                    [
+                      {
+                        text: "OK",
+                        onPress: () => setModalVisible1(!modalVisible1)
+                      }
+                    ]
+                  );
             })
           }
         })
       })
+
     }
 
+
         function sell() {
-          console.log("test");
-          fetch("http://192.168.1.7:8080/user/userWallet").then(res => {
+          console.log(val);
+          fetch("http://192.168.8.55:8080/user/userWallet").then(res => {
             return res.json()
           }).then(data => {
             data.map(i => {
               if (i.f_uid == user.uid) {
-                //console.log(i)
-                //console.log(i.id+" "+name+" "+val+" "+val*priceUsd)
-                fetch("http://192.168.1.7:8080/wallet/sell", {
+                fetch("http://192.168.8.55:8080/wallet/sell", {
                   method: 'POST',
                   headers: {
                     'Accept': 'application/json',
@@ -88,28 +98,31 @@ export default function Details (props) {
                 }).then(res => {
                   return res.json()
                 }).then(info => {
-                  alert("Done")
-                  history.push("/Home")
+                Alert.alert(
+                "Done!",
+                `you just Sell ${val} ${name}`,
+                [{
+                         text: "OK",
+                         onPress: () => setModalVisible2(!modalVisible2)                        }]
+                           );
                 })
               }
             })
           })
         }
     function renderData () {
-        fetch("http://192.168.1.7:8080/user/userWallet").then(res => {
+        fetch("http://192.168.8.55:8080/user/userWallet").then(res => {
           return res.json()
         }).then(data => {
           data.map(i => {
             if(i.f_uid == user.uid){
-              setPrice(i.solde)
-              //console.log(i)
-              fetch("http://192.168.1.7:8080/wallet/allWallet").then(res => {
+              setPrice(i.solde.toFixed(2))
+              fetch("http://192.168.8.55:8080/wallet/allWallet").then(res => {
                 return res.json()
               }).then(info => {
                 info.map(o => {
                   if(o.id_user == i.id){
                     if(o.cryp_name.toLowerCase() == name.toLowerCase()) {
-                      //console.log(o)
                       setValue(o.value)
                     }
                   }
@@ -133,7 +146,7 @@ axios.get(`https://api.coincap.io/v2/assets/${id}/history?interval=d1&start=${te
      console.log(`https://api.coincap.io/v2/assets/${id}/history?interval=d1&start=${tennDaysAgo}&end=${timenow}`)
      
      let data = response.data.data;
-      console.log(data);
+     console.log(data);
      let date = [];
      let value = [];
      for (let i = 0; i < 7; i++) {
@@ -142,8 +155,7 @@ axios.get(`https://api.coincap.io/v2/assets/${id}/history?interval=d1&start=${te
      }
     setDate(date)
     setPriceUsd(value)
-     console.log(date);
-      console.log(value);
+
     
     })
   .catch(function (error) {
@@ -153,8 +165,6 @@ axios.get(`https://api.coincap.io/v2/assets/${id}/history?interval=d1&start=${te
   .then(function () {
     // always executed
   });
-
-
     }  
 
     // logOut function :
@@ -169,23 +179,21 @@ axios.get(`https://api.coincap.io/v2/assets/${id}/history?interval=d1&start=${te
       getData()
       renderData()
       console.log(user.uid)
-    }, [])
+    }, [modalVisible1, modalVisible2])
     
 
     return (
         <ScrollView>
-            <NavBar>
-            <NavTitle>
-            {user.email}
-            </NavTitle>
+            <NavBar style={styles}>
             <NavButton onPress={() => {history.push("/Home")}}>
-                <NavButtonText>
-                    {"Retour"}
+               <NavButtonText style={styles.Text}>
+                    {"Coins"}
                 </NavButtonText>
             </NavButton>
             <NavButton onPress={logOut}>
-            <NavButtonText>
-                {"Se Deconnecter"}
+            <NavButtonText
+            style={styles.logout}>
+                {"LogOut"}
             </NavButtonText>
             </NavButton>
             </NavBar>
@@ -207,22 +215,99 @@ axios.get(`https://api.coincap.io/v2/assets/${id}/history?interval=d1&start=${te
                         }>{parseFloat(changePercent24Hr).toFixed(2)} %</Text>
                     </View>
                 </View>
-                <View style={styles.listItem}>
-                  <Text style={{fontWeight:"bold"}}>My Solde Is : {price}</Text>
+
+                <View >
+                  <Text style={{fontWeight:"bold",marginBottom:15}}>My Solde : {price}$</Text>
+                  <Text style={{fontWeight:"bold"}}>Number of {name} : {value}{symbol}</Text>
                 </View>
-                <View style={styles.listItem}>
-                  <Text style={{fontWeight:"bold"}}>How Many {name} Currency You Have : {value}</Text>
-                </View>
-                <View style={styles.listItem}>
-                    <TextInput
-                    placeholder={"Enter The Value of Currency you Want to Buy"}
+
+                <View style={{justifyContent:"center",alignItems:"center",flex:1}}>
+                      <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={modalVisible1}
+                        onRequestClose={() => {
+                          Alert.alert("Modal has been closed.");
+                          setModalVisible1(!modalVisible1);
+                        }}
+                  >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+                  <Text style={styles.modelText}> Value of Currency you Want to Buy </Text>
+                    <TextInput style={styles.valueInput}
+                    keyboardType = 'numeric'
+                    placeholder={"Enter The Value "}
                     onChangeText={setCurrVal}
                     />
-                </View>
-                <View style={{justifyContent:"center",alignItems:"center",flex:1}}>
-                    <Text style={styles.txt} onPress={buy}>Buy</Text>
-                    <Text style={styles.txt} onPress={sell} >Sell</Text>
-                </View>
+            <View style={styles.buttonsHolder}>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={buy}
+            >
+              <Text style={styles.textStyle}>Buy</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setModalVisible1(!modalVisible1)}
+            >
+              <Text style={styles.textStyle}>Cancel</Text>
+            </Pressable>
+            </View>        
+          </View>
+        </View>
+      </Modal>
+                            <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={modalVisible2}
+                        onRequestClose={() => {
+                          Alert.alert("Modal has been closed.");
+                          setModalVisible2(!modalVisible2);
+                        }}
+                  >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+                  <Text style={styles.modelText}> Value of Currency you Want to SELL </Text>
+                    <TextInput style={styles.valueInput}
+                    keyboardType = 'numeric'
+                    placeholder={"Enter The Value "}
+                    onChangeText={setCurrVal}
+                    />
+            <View style={styles.buttonsHolder}>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={sell}
+            >
+              <Text style={styles.textStyle}>Sell</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setModalVisible2(!modalVisible2)}
+            >
+              <Text style={styles.textStyle}>Cancel</Text>
+            </Pressable>
+            </View>        
+          </View>
+        </View>
+      </Modal>
+      
+            <View style={styles.buttonsHolder}>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setModalVisible1(!modalVisible1)}
+            >
+              <Text style={styles.textStyle}>Buy</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setModalVisible2(!modalVisible2)}
+            >
+              <Text style={styles.textStyle}>Sell</Text>
+            </Pressable>
+            </View>   
+               
+               </View>
+               <Text style={styles.charrtdesc}>the market change of the currency in the last 7 days </Text>
                 <LineChart
                     data={{
                         labels: date,
@@ -233,14 +318,15 @@ axios.get(`https://api.coincap.io/v2/assets/${id}/history?interval=d1&start=${te
                         ]
                     }}
                     width={Dimensions.get("window").width} // from react-native
-                    height={220}
+                    height={310}
                     yAxisLabel="$"
                     yAxisInterval={1} // optional, defaults to 1
                     chartConfig={{
+                      
                     backgroundColor: "#e26a00",
-                    backgroundGradientFrom: "#fb8c00",
-                    backgroundGradientTo: "#ffa726",
-                    decimalPlaces: 1, // optional, defaults to 2dp
+                    backgroundGradientFrom: "#FEB227",
+                    backgroundGradientTo: "#FFD992",
+                    decimalPlaces: 2, // optional, defaults to 2dp
                     color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                     labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                     style: {
@@ -249,12 +335,12 @@ axios.get(`https://api.coincap.io/v2/assets/${id}/history?interval=d1&start=${te
                     propsForDots: {
                         r: "6",
                         strokeWidth: "5",
-                        stroke: "#ffa726"
+                        stroke: "#87BFF3"
                     }
                     }}
                     bezier
                     style={{
-                    margin:2,
+                    marginTop:10,
                     padding:2
                     }}
                 /> 
@@ -384,21 +470,94 @@ const styles = StyleSheet.create({
       alignSelf: "center",
       textTransform: "uppercase"
     },
-    listItem:{
-      margin:10,
-      padding:10,
-      backgroundColor:"#FFF",
-      width:"95%",
-      alignSelf:"center",
-      flexDirection:"row",
-      borderRadius:5,
-      elevation: 8,
-    },
-    input: {
+    // listItem:{
+    //   margin:10,
+    //   padding:10,
+    //   backgroundColor:"#FFF",
+    //   width:"95%",
+    //   alignSelf:"center",
+    //   flexDirection:"row",
+    //   borderRadius:5,
+    //   elevation: 8,
+    // },
+    valueInput: {
       paddingVertical: 10,
       paddingHorizontal: 15,
       backgroundColor: "#f1f2f6",
-      borderRadius: 60,
-      width: "80%",
+      borderRadius: 23,
+      width: 140,
+      textAlign: "center"
     },
+    logout: {
+      color: "red",
+    },
+    Text :{
+      color: "#FFFFFF",
+      fontWeight: "bold",        
+    },
+       navBar: {
+         backgroundColor: '#006CD5',
+       },
+         centeredView: {
+             flex: 1,
+             justifyContent: "center",
+             alignItems: "center",
+             marginTop: 22
+           },
+           modalView: {
+             margin: 20,
+             backgroundColor: "white",
+             borderRadius: 20,
+             padding: 35,
+             alignItems: "center",
+             shadowColor: "#000",
+             shadowOffset: {
+               width: 0,
+               height: 2
+             },
+             shadowOpacity: 0.25,
+             shadowRadius: 4,
+             elevation: 5
+           },
+           button: {
+             margin:10,
+             borderRadius: 12,
+             padding: 10,
+             elevation: 2,
+             width: 110,
+           },
+           buttonOpen: {
+             backgroundColor: "#F194FF",
+           },
+           buttonClose: {
+             backgroundColor: "#2196F3",
+           },
+           textStyle: {
+             color: "white",
+             fontWeight: "bold",
+             textAlign: "center"
+           },
+           modalText: {
+             marginBottom: 15,
+             textAlign: "center"
+           },
+           buttonsHolder:{
+             marginTop:10,
+             display: "flex",
+             flexDirection: 'row',
+             flexWrap: 'wrap'
+           },
+           modelText:{
+             color: "#1C91FF",
+             margin: 10,
+             fontWeight: "bold"
+           },
+           charrtdesc:{
+             marginTop:50,
+             fontSize:15,
+             fontWeight: "bold",
+             color: "#31518D"
+           }
+
+        
 });

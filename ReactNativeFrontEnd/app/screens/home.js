@@ -1,19 +1,23 @@
-import React, { useState } from 'react'
-import { Button, StyleSheet, Text, View, Dimensions, TextInput, ScrollView, Image, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState,useEffect  } from 'react'
+import {
+    StyleSheet,
+    Text,
+    View,
+    StatusBar,
+    ScrollView,
+    Image,
+    TouchableOpacity
+} from 'react-native';
 import firebase from '../config'
 import { useHistory } from 'react-router';
-import { useEffect } from 'react';
-import NavBar, { NavButton, NavButtonText, NavTitle } from 'react-native-nav';
+import NavBar, { NavButton, NavButtonText } from 'react-native-nav';
 
 
 export default function Home () {
 
     let history = useHistory()
-    const [names, setNames] = React.useState([])
-
-    var user = firebase.auth().currentUser;
-    //console.log(user.uid)
-
+    const [names, setNames] = useState([])
+     firebase.auth().currentUser;
     function renderCoinData () {
         fetch("http://api.coincap.io/v2/assets?limit=15").then(res => {
             return res.json()
@@ -22,48 +26,10 @@ export default function Home () {
             setNames(info.data)
         })
     }
-
-    // function buyCoins (id) {
-    //     alert(id)
-    // }
-
-    renderCoinData()
     
-
     function toWallet () {
-        fetch("http://192.168.1.7:8080/user/userWallet").then(res => {
-            return res.json()
-        }).then(info => {
-            //console.log(info)
-            info.map(i => {
-                //console.log(i.f_uid)
-                if(user.uid == i.f_uid){
-                    console.log("kayn")
-                    history.push("/Wallet")
-                } else {
-                    console.log("makaynch")
-                    history.push("/Wallet")
-                }
-                if(user.uid != i.f_uid) {
-                    fetch(`http://192.168.1.7:8080/user/add/${user.uid}`, {
-                        method : 'POST',
-                        headers : {
-                            'Content-Type' : 'application/json'
-                        },
-                        body : JSON.stringify({
-                            f_uid : user.uid
-                        })
-                    }).then(res => {
-                        history.push("/Wallet")
-                    })
-                } else {
-                    history.push("/Wallet")
-                }
-            })
-        })
         history.push("/Wallet")
     }
-
     // logOut function :
     function logOut () {
         firebase.auth().signOut().then(() => {
@@ -71,30 +37,32 @@ export default function Home () {
         })
         history.push("/")
     }
-
     useEffect(() => {
+        renderCoinData()
     }, [])
 
     return (
-        <ScrollView>
-            <NavBar>
-            <NavTitle>
-            {user.email}
-            </NavTitle>
+        <ScrollView style={styles.view}>
+        <StatusBar
+        backgroundColor="black"
+        barStyle = 'light-content'
+         />
+            <NavBar style={styles}>
             <NavButton onPress={toWallet}>
-                <NavButtonText>
+                <NavButtonText style={styles.Text}>
                     {"My Wallet"}
                 </NavButtonText>
             </NavButton>
             <NavButton onPress={logOut}>
-            <NavButtonText>
-                {"Se Deconnecter"}
+            <NavButtonText
+            style={styles.logout}>
+                {"LogOut"}
             </NavButtonText>
             </NavButton>
             </NavBar>
                 {names.map((i) => (
-                    <TouchableOpacity onPress={() => history.push('/Details', i)}>
-                        <View style={styles.listItem}>
+                    <TouchableOpacity key={i.symbol} onPress={() => history.push('/Details', i)}>
+                        <View  style={styles.listItem}>
                             <Image source={{uri: `https://assets.coincap.io/assets/icons/${i.symbol.toLowerCase()}@2x.png`}}  style={{width:40, height:40,borderRadius:30}} />
                             <View style={{justifyContent:"center",alignItems:"flex-start",flex:1,marginHorizontal: "5%"}}>
                                 <Text style={{fontWeight:"bold"}}>{i.name}</Text>
@@ -116,16 +84,22 @@ export default function Home () {
 }
 
 const styles = StyleSheet.create({
+    view:{ 
+backgroundColor: "#C3E2FF"
+    },
+   navBar: {
+    backgroundColor: '#006CD5',
+    },
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#C3E2FF',
         marginTop:0
     },
     listItem:{
-        margin:10,
-        padding:20,
-        backgroundColor:"#FFF",
-        width:"90%",
+        margin:5,
+        padding:15,
+        backgroundColor: "#FFFFFF",
+        width:"95%",
         flex:1,
         alignSelf:"center",
         flexDirection:"row",
@@ -136,6 +110,12 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         justifyContent: 'center',
         alignItems: 'center'
-    
+    },
+    logout :{
+        color: "red",
+    },
+    Text :{
+    color: "#FFFFFF",
+    fontWeight: "bold",        
     }
 });

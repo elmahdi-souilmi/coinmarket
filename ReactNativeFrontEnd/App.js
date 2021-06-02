@@ -16,11 +16,11 @@ export default function App() {
   return (
     <NativeRouter>
       <Switch>
-        <Route exact path="/" component={LogintoHome} />
-        <Route exact path="/Home" component={Home} />
-        <Route exact path="/Inscription" component={Login} />
-        <Route exact path="/Wallet" component={Wallet} />
-        <Route exact path="/Details" component={Details} />
+        <Route exact  path="/" component={LogintoHome} />
+        <Route exact  path="/Home" component={Home} />
+        <Route exact  path="/Inscription" component={Login} />
+        <Route exact  path="/Wallet" component={Wallet} />
+        <Route exact  path="/Details" component={Details} />
       </Switch>
     </NativeRouter>
   );
